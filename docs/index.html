@@ -1093,37 +1093,58 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       .container {
-        padding: 0 24px;
+        padding: 0 20px;
       }
 
       header {
-        padding: 16px 0;
+        padding: 14px 0;
+      }
+
+      header .container {
+        padding: 0 16px;
       }
 
       nav {
-        gap: 24px;
+        gap: 20px;
       }
 
       nav a {
         font-size: 0.8rem;
+        padding: 4px 0;
+      }
+
+      .logo {
+        font-size: 0.85rem;
       }
 
       .hero {
-        padding: 100px 0 60px;
+        padding: 90px 0 50px;
         min-height: auto;
       }
 
       .hero h1 {
-        font-size: 2.25rem;
+        font-size: 2rem;
+      }
+
+      .hero-tagline {
+        font-size: 1.2rem;
       }
 
       .hero .subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .hero-badge {
+        font-size: 0.7rem;
+        padding: 6px 12px;
       }
 
       .btn {
         padding: 12px 24px;
         font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
       }
 
       .btn-secondary {
@@ -1134,51 +1155,314 @@
       .hero-cta {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 12px;
+        width: 100%;
+        max-width: 280px;
       }
 
       section {
-        padding: 72px 0;
+        padding: 50px 0;
       }
 
-      .card {
-        padding: 32px;
+      .section-label {
+        font-size: 0.65rem;
+        margin-bottom: 20px;
       }
 
-      .card h3 {
-        font-size: 1.3rem;
+      /* Duo Section */
+      .duo-section {
+        padding: 40px 0;
       }
 
-      .principles li {
-        padding: 16px 20px;
+      .duo-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
       }
 
-      .contact {
-        padding: 80px 24px;
+      .minimal-list li {
+        font-size: 0.95rem;
+        padding: 14px 0;
       }
 
-      footer .container {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      nav {
-        gap: 16px;
+      /* Tech Section */
+      .tech-section {
+        padding: 40px 0;
       }
 
-      .hero h1 {
-        font-size: 2rem;
+      .tech-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
       }
 
+      .tech-column h4 {
+        font-size: 0.7rem;
+        margin-bottom: 10px;
+      }
+
+      .tech-column li {
+        font-size: 0.9rem;
+        padding: 4px 0;
+      }
+
+      /* Work Section */
+      .work-section {
+        padding: 50px 0;
+      }
+
+      .work-card {
+        padding: 24px;
+      }
+
+      .work-card h3 {
+        font-size: 1.2rem;
+      }
+
+      .work-desc {
+        font-size: 0.95rem;
+      }
+
+      .work-shows {
+        padding: 16px;
+      }
+
+      .work-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .work-badge {
+        font-size: 0.65rem;
+        padding: 5px 10px;
+      }
+
+      /* Matters Section */
+      .matters-section {
+        padding: 40px 0;
+      }
+
+      .matters-list li {
+        font-size: 1rem;
+        padding: 14px 0;
+      }
+
+      /* Snapshot Section */
+      .snapshot-section {
+        padding: 40px 0;
+      }
+
+      .snapshot-content {
+        max-width: 100%;
+      }
+
+      .snapshot-content p {
+        font-size: 0.95rem;
+      }
+
+      /* Principles Section */
+      .principles-section {
+        padding: 30px 0;
+      }
+
+      .principles-inline {
+        gap: 6px;
+      }
+
+      .principles-inline span {
+        font-size: 0.85rem;
+      }
+
+      /* Card */
       .card {
         padding: 24px;
       }
 
+      .card h3 {
+        font-size: 1.25rem;
+      }
+
+      .card>p {
+        font-size: 0.95rem;
+      }
+
+      .card-meta {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .card-badge {
+        font-size: 0.65rem;
+      }
+
       .states {
+        padding: 16px;
+        gap: 8px;
         justify-content: center;
+      }
+
+      .state-box {
+        font-size: 0.7rem;
+        padding: 8px 12px;
+      }
+
+      .hook {
+        font-size: 0.9rem;
+        padding: 16px 0 16px 16px;
+        margin: 20px 0;
+      }
+
+      /* Flow Sections */
+      .flow-section {
+        margin: 32px 0;
+        max-width: 100%;
+      }
+
+      .simple-list li {
+        font-size: 0.95rem;
+        padding: 14px 16px;
+      }
+
+      /* Strengths Grid */
+      .strengths-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      /* Value List */
+      .value-list li {
+        font-size: 0.95rem;
+        padding: 16px;
+        gap: 12px;
+      }
+
+      /* Principles */
+      .principles li {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      /* Contact */
+      .contact {
+        padding: 60px 20px;
+      }
+
+      .contact p {
+        font-size: 1rem;
+      }
+
+      .contact-email {
+        font-size: 1rem;
+      }
+
+      .contact-socials {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* Footer */
+      footer {
+        padding: 30px 16px;
+      }
+
+      footer .container {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .social-links {
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 0 16px;
+      }
+
+      nav {
+        gap: 12px;
+      }
+
+      nav a {
+        font-size: 0.75rem;
+      }
+
+      .logo {
+        font-size: 0.8rem;
+      }
+
+      .hero {
+        padding: 80px 0 40px;
+      }
+
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+
+      .hero-tagline {
+        font-size: 1.1rem;
+      }
+
+      .hero .subtitle {
+        font-size: 0.95rem;
+      }
+
+      section {
+        padding: 40px 0;
+      }
+
+      .tech-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .states {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .state-box {
+        text-align: center;
+      }
+
+      .state-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+      }
+
+      .btn {
+        padding: 14px 20px;
+      }
+
+      .hero-cta {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+
+      .hero-tagline {
+        font-size: 1rem;
+      }
+
+      .hero .subtitle {
+        font-size: 0.9rem;
+      }
+
+      nav {
+        gap: 10px;
+      }
+
+      nav a {
+        font-size: 0.7rem;
       }
     }
   </style>

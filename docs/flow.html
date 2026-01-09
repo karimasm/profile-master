@@ -963,93 +963,447 @@
       .flow-item:nth-child(even) {
         direction: ltr;
       }
+
+      /* Adjust card deck for tablets */
+      .card-deck {
+        min-height: 400px;
+      }
+
+      .deck-card {
+        width: 160px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-200px) rotate(-10deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-130px) rotate(-6deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(-65px) rotate(-3deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(0px) rotate(0deg);
+      }
+
+      .deck-card:nth-child(5) {
+        transform: translateX(65px) rotate(3deg);
+      }
+
+      .deck-card:nth-child(6) {
+        transform: translateX(130px) rotate(6deg);
+      }
+
+      .deck-card:nth-child(7) {
+        transform: translateX(200px) rotate(10deg);
+      }
+
+      .deck-card .card-image {
+        height: 200px;
+      }
     }
 
     @media (max-width: 768px) {
       .container {
-        padding: 0 24px;
+        padding: 0 20px;
       }
 
       nav {
-        padding: 16px 0;
+        padding: 14px 0;
       }
 
-      .header {
-        padding: 120px 0 60px;
+      nav .container {
+        padding: 0 16px;
       }
 
-      .header h1 {
-        font-size: 2rem;
-      }
-
-      .header .intro {
-        font-size: 1.1rem;
-      }
-
-      article {
-        padding: 56px 0;
-      }
-
-      article h2 {
-        margin-top: 48px;
-        font-size: 1.3rem;
-      }
-
-      .state-diagram {
-        padding: 32px 24px;
-        gap: 12px;
-      }
-
-      .state-box {
-        padding: 14px 20px;
+      nav a.back-link {
         font-size: 0.8rem;
       }
 
+      .header {
+        padding: 100px 0 50px;
+      }
+
+      .header h1 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+      }
+
+      .header .intro {
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .header-meta {
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+
+      .meta-badge {
+        font-size: 0.65rem;
+        padding: 6px 10px;
+      }
+
+      .header .section-label {
+        font-size: 0.65rem;
+        margin-bottom: 12px;
+      }
+
+      article {
+        padding: 50px 0;
+      }
+
+      article h2 {
+        margin-top: 40px;
+        font-size: 1.25rem;
+        margin-bottom: 18px;
+      }
+
+      article p {
+        font-size: 0.95rem;
+        margin-bottom: 14px;
+      }
+
+      article ul {
+        padding-left: 20px;
+        margin-bottom: 20px;
+      }
+
+      article li {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+      }
+
+      .state-diagram {
+        padding: 24px 16px;
+        gap: 10px;
+        margin: 32px 0;
+      }
+
+      .state-box {
+        padding: 12px 16px;
+        font-size: 0.75rem;
+      }
+
+      .flow-section {
+        margin: 28px 0;
+        max-width: 100%;
+      }
+
       .flow-showcase {
-        margin: 56px 0;
+        margin: 48px 0;
+      }
+
+      /* Card Deck - Stacked for mobile */
+      .card-deck {
+        min-height: 360px;
+        margin: 32px 0 48px;
+      }
+
+      .deck-card {
+        width: 140px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-120px) rotate(-10deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-80px) rotate(-6deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(-40px) rotate(-3deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(0px) rotate(0deg);
+      }
+
+      .deck-card:nth-child(5) {
+        transform: translateX(40px) rotate(3deg);
+      }
+
+      .deck-card:nth-child(6) {
+        transform: translateX(80px) rotate(6deg);
+      }
+
+      .deck-card:nth-child(7) {
+        transform: translateX(120px) rotate(10deg);
+      }
+
+      .deck-card .card-image {
+        height: 180px;
+        padding: 8px;
+      }
+
+      .deck-card .card-content {
+        padding: 8px;
+      }
+
+      .deck-card .card-content h3 {
+        font-size: 0.6rem;
+      }
+
+      .deck-hint {
+        font-size: 0.7rem;
+        margin-top: 20px;
+      }
+
+      .tarot-popup {
+        width: 95%;
+        max-width: 400px;
+        border-radius: 16px;
+      }
+
+      .tarot-popup .popup-image {
+        max-height: 350px;
+        padding: 16px;
+      }
+
+      .tarot-popup .popup-content {
+        padding: 20px;
+      }
+
+      .tarot-popup .popup-title {
+        font-size: 1.1rem;
+      }
+
+      .tarot-popup .popup-tagline {
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+      }
+
+      .tarot-popup .popup-reading {
+        font-size: 0.85rem;
+      }
+
+      .tarot-popup .popup-close {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        top: 10px;
+        right: 10px;
       }
 
       .flow-item {
-        margin-bottom: 56px;
+        margin-bottom: 48px;
       }
 
       .flow-content h3 {
-        font-size: 1.2rem;
-      }
-
-      .quote {
-        padding: 48px 24px;
         font-size: 1.15rem;
       }
 
-      .lesson {
-        padding: 24px;
+      .flow-content p {
+        font-size: 0.9rem;
       }
 
-      .lesson:hover {
-        padding-left: 32px;
+      .quote {
+        padding: 40px 20px;
+        font-size: 1.1rem;
       }
 
       .highlight {
-        padding: 24px;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 28px 0;
+      }
+
+      .highlight p {
+        font-size: 0.9rem;
       }
 
       .principles-box {
-        padding: 24px;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 28px 0;
+      }
+
+      .principles-box p {
+        font-size: 0.95rem;
+      }
+
+      .lesson {
+        padding: 20px;
+      }
+
+      .lesson h3 {
+        font-size: 1rem;
+      }
+
+      .lesson p {
+        font-size: 0.9rem;
+      }
+
+      .lesson:hover {
+        padding-left: 28px;
+      }
+
+      .back {
+        padding: 40px 0 0;
+      }
+
+      .back a {
+        font-size: 0.9rem;
+        padding: 14px 28px;
+      }
+
+      footer {
+        padding: 30px 16px;
+      }
+
+      .footer-text {
+        font-size: 0.7rem;
       }
     }
 
     @media (max-width: 480px) {
+      .container {
+        padding: 0 16px;
+      }
+
+      .header {
+        padding: 90px 0 40px;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .header .intro {
+        font-size: 0.95rem;
+      }
+
       .state-diagram {
         flex-direction: column;
+        padding: 20px;
+      }
+
+      .state-box {
+        width: 100%;
+        text-align: center;
       }
 
       .arrow {
         transform: rotate(90deg);
       }
 
+      /* Card Deck - Even more compact for small phones */
+      .card-deck {
+        min-height: 320px;
+      }
+
+      .deck-card {
+        width: 110px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-90px) rotate(-12deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-60px) rotate(-8deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(-30px) rotate(-4deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(0px) rotate(0deg);
+      }
+
+      .deck-card:nth-child(5) {
+        transform: translateX(30px) rotate(4deg);
+      }
+
+      .deck-card:nth-child(6) {
+        transform: translateX(60px) rotate(8deg);
+      }
+
+      .deck-card:nth-child(7) {
+        transform: translateX(90px) rotate(12deg);
+      }
+
+      .deck-card .card-image {
+        height: 140px;
+      }
+
+      .deck-card .card-content h3 {
+        font-size: 0.55rem;
+      }
+
       .header-meta {
-        gap: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      article h2 {
+        font-size: 1.15rem;
+      }
+
+      .quote {
+        padding: 32px 16px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .header h1 {
+        font-size: 1.35rem;
+      }
+
+      .header .intro {
+        font-size: 0.9rem;
+      }
+
+      nav a.back-link {
+        font-size: 0.75rem;
+      }
+
+      .card-deck {
+        min-height: 280px;
+      }
+
+      .deck-card {
+        width: 90px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-70px) rotate(-12deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-45px) rotate(-8deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(-22px) rotate(-4deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(0px) rotate(0deg);
+      }
+
+      .deck-card:nth-child(5) {
+        transform: translateX(22px) rotate(4deg);
+      }
+
+      .deck-card:nth-child(6) {
+        transform: translateX(45px) rotate(8deg);
+      }
+
+      .deck-card:nth-child(7) {
+        transform: translateX(70px) rotate(12deg);
+      }
+
+      .deck-card .card-image {
+        height: 110px;
       }
     }
   </style>
