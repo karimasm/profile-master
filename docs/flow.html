@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Flow — An honest attention system. Case study by Karima.">
+  <title>Flow — Designing an Honest Attention System | Karima</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-tertiary: #1a1a1a;
+      --bg-card: #141414;
+      --text-primary: #f5f5f5;
+      --text-secondary: #a1a1a1;
+      --text-muted: #525252;
+      --accent: #ffffff;
+      --accent-dim: #404040;
+      --border: #262626;
+      --border-light: #333333;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 30px rgba(255, 255, 255, 0.1);
+      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.8;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 20px 0;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    nav a.back-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    nav a.back-link:hover {
+      color: var(--text-primary);
+    }
+
+    nav a.back-link::before {
+      content: '←';
+      font-size: 1rem;
+      transition: transform var(--transition-smooth);
+    }
+
+    nav a.back-link:hover::before {
+      transform: translateX(-4px);
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      padding: 140px 0 80px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background:
+        radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(255, 255, 255, 0.01) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .meta-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 8px 14px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+
+    .meta-badge.accent {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-color: var(--text-primary);
+    }
+
+    .header .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .header .intro {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 680px;
+      line-height: 1.7;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+
+    /* ===== CONTENT ===== */
+    article {
+      padding: 80px 0;
+    }
+
+    article h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 72px;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    article h2:first-child {
+      margin-top: 0;
+    }
+
+    article p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+      line-height: 1.85;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    article ul {
+      padding-left: 24px;
+      margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    article li {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      line-height: 1.75;
+    }
+
+    article li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--text-primary);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin: 40px 0;
+      animation: scaleIn 0.5s ease;
+    }
+
+    .highlight p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      line-height: 1.75;
+    }
+
+    /* ===== PRINCIPLES BOX ===== */
+    .principles-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin: 40px 0;
+      animation: scaleIn 0.5s ease;
+    }
+
+    .principles-box p {
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+    }
+
+    .principles-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .principles-box strong {
+      color: var(--text-primary);
+    }
+
+    /* ===== STATE DIAGRAM ===== */
+    .state-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 48px 0;
+      padding: 44px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      animation: scaleIn 0.5s ease;
+    }
+
+    .state-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 16px 28px;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      transition: all var(--transition-smooth);
+    }
+
+    .state-box.active {
+      background: var(--text-primary);
+      border-color: var(--text-primary);
+      color: var(--bg-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .arrow {
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      font-weight: 300;
+    }
+
+    /* ===== FLOW SECTIONS - Visual Flow Alignment ===== */
+    .flow-section {
+      margin: 48px 0;
+      max-width: 600px;
+    }
+
+    .flow-section.align-left {
+      text-align: left;
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .flow-section.align-center {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .flow-section.align-center .principles-box {
+      text-align: center;
+    }
+
+    .flow-section.align-right {
+      text-align: right;
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .flow-section.align-right .state-diagram {
+      justify-content: flex-end;
+    }
+
+    /* ===== FLOW SHOWCASE ===== */
+    .flow-showcase {
+      margin: 72px 0;
+    }
+
+    /* ===== TAROT DECK CARD STACK ===== */
+    .card-deck {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 480px;
+      margin: 48px 0 72px;
+      perspective: 1200px;
+    }
+
+    .deck-card {
+      position: absolute;
+      width: 200px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-origin: center bottom;
+      box-shadow: var(--shadow-md);
+    }
+
+    .deck-card:hover {
+      top: -30px;
+      filter: brightness(1.15);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Selected state - card comes forward before popup */
+    .deck-card.selected {
+      top: -50px;
+      z-index: 100 !important;
+      filter: brightness(1.25);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 50px rgba(255, 255, 255, 0.15);
+    }
+
+    /* 7 cards fanned out - wider spread */
+    .deck-card:nth-child(1) {
+      transform: translateX(-300px) rotate(-12deg);
+      z-index: 7;
+    }
+
+    .deck-card:nth-child(2) {
+      transform: translateX(-200px) rotate(-8deg);
+      z-index: 6;
+    }
+
+    .deck-card:nth-child(3) {
+      transform: translateX(-100px) rotate(-4deg);
+      z-index: 5;
+    }
+
+    .deck-card:nth-child(4) {
+      transform: translateX(0px) rotate(0deg);
+      z-index: 4;
+    }
+
+    .deck-card:nth-child(5) {
+      transform: translateX(100px) rotate(4deg);
+      z-index: 3;
+    }
+
+    .deck-card:nth-child(6) {
+      transform: translateX(200px) rotate(8deg);
+      z-index: 2;
+    }
+
+    .deck-card:nth-child(7) {
+      transform: translateX(300px) rotate(12deg);
+      z-index: 1;
+    }
+
+    /* Active card - expanded */
+    .deck-card.active {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(0deg) scale(1) !important;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      z-index: 1001 !important;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);
+    }
+
+    .deck-card .card-image {
+      width: 100%;
+      height: 260px;
+      object-fit: contain;
+      object-position: center;
+      background: var(--bg-tertiary);
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    .deck-card .card-content {
+      padding: 10px;
+      text-align: center;
+    }
+
+    .deck-card .card-content h3 {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .deck-card .card-content .feature-tagline,
+    .deck-card .card-content .card-description {
+      display: none;
+    }
+
+    .deck-card .close-btn {
+      display: none;
+    }
+
+    .deck-card .close-btn {
+      display: none;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .deck-card.active .close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .deck-card .close-btn:hover {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    /* Overlay when card is active */
+    .deck-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+      transition: all 0.4s ease;
+    }
+
+    .deck-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Tarot Reading Popup */
+    .tarot-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      width: 95%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(165deg, #1a1a1a, #0d0d0d);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      z-index: 1001;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow:
+        0 0 80px rgba(255, 255, 255, 0.05),
+        0 30px 100px rgba(0, 0, 0, 0.9);
+    }
+
+    .tarot-popup.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .tarot-popup .popup-image {
+      width: 100%;
+      max-height: 450px;
+      object-fit: contain;
+      background: #0a0a0a;
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tarot-popup .popup-content {
+      padding: 28px;
+      text-align: center;
+    }
+
+    .tarot-popup .popup-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .tarot-popup .popup-tagline {
+      font-size: 1rem;
+      font-style: italic;
+      color: #888;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tarot-popup .popup-reading {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-style: italic;
+    }
+
+    .tarot-popup .popup-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .tarot-popup .popup-close:hover {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .deck-hint {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 28px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .deck-card {
+        width: 200px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-120px) rotate(-10deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-40px) rotate(-4deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(40px) rotate(4deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(120px) rotate(10deg);
+      }
+
+      .deck-card .card-image {
+        height: 120px;
+      }
+
+      .deck-card .card-content {
+        padding: 14px;
+      }
+
+      .deck-card .card-content h3 {
+        font-size: 0.85rem;
+      }
+
+      .deck-card .card-content .feature-tagline,
+      .deck-card .card-content .card-description {
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .card-deck {
+        min-height: 380px;
+      }
+
+      .deck-card {
+        width: 160px;
+      }
+
+      .deck-card:nth-child(1) {
+        transform: translateX(-80px) rotate(-12deg);
+      }
+
+      .deck-card:nth-child(2) {
+        transform: translateX(-28px) rotate(-4deg);
+      }
+
+      .deck-card:nth-child(3) {
+        transform: translateX(28px) rotate(4deg);
+      }
+
+      .deck-card:nth-child(4) {
+        transform: translateX(80px) rotate(12deg);
+      }
+
+      .deck-card .card-image {
+        height: 90px;
+      }
+
+      .deck-card .card-content {
+        padding: 10px;
+      }
+
+      .deck-card .card-content h3 {
+        font-size: 0.75rem;
+      }
+
+      .deck-card .card-content .feature-tagline {
+        display: none;
+      }
+
+      .deck-card .card-content .card-description {
+        display: none;
+      }
+    }
+
+    .flow-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: 80px;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    .flow-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .flow-item:nth-child(even) {
+      direction: rtl;
+    }
+
+    .flow-item:nth-child(even)>* {
+      direction: ltr;
+    }
+
+    .flow-content h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .flow-content p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+      line-height: 1.75;
+    }
+
+    .flow-content .feature-tagline {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+
+    .flow-image-wrapper {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      transition: all var(--transition-smooth);
+    }
+
+    .flow-image-wrapper:hover {
+      border-color: var(--border-light);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .flow-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform var(--transition-smooth);
+    }
+
+    .flow-image-wrapper:hover .flow-image {
+      transform: scale(1.02);
+    }
+
+    .flow-image-label {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    /* ===== QUOTE ===== */
+    .quote {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 64px 40px;
+      margin: 64px 0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      line-height: 1.6;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    /* ===== LESSONS ===== */
+    .lessons {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin: 48px 0;
+      animation: scaleIn 0.5s ease;
+    }
+
+    .lesson {
+      padding: 28px 36px;
+      border-bottom: 1px solid var(--border);
+      transition: all var(--transition-smooth);
+    }
+
+    .lesson:last-child {
+      border-bottom: none;
+    }
+
+    .lesson:hover {
+      background: var(--bg-tertiary);
+      padding-left: 44px;
+    }
+
+    .lesson strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .lesson p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ===== BACK ===== */
+    .back {
+      padding: 60px 0 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .back a {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 16px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: all var(--transition-smooth);
+    }
+
+    .back a:hover {
+      background: var(--text-primary);
+      color: var(--bg-primary);
+    }
+
+    .back a::before {
+      content: '←';
+      font-size: 1rem;
+      transition: transform var(--transition-smooth);
+    }
+
+    .back a:hover::before {
+      transform: translateX(-4px);
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .flow-item {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .flow-item:nth-child(even) {
+        direction: ltr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 24px;
+      }
+
+      nav {
+        padding: 16px 0;
+      }
+
+      .header {
+        padding: 120px 0 60px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .header .intro {
+        font-size: 1.1rem;
+      }
+
+      article {
+        padding: 56px 0;
+      }
+
+      article h2 {
+        margin-top: 48px;
+        font-size: 1.3rem;
+      }
+
+      .state-diagram {
+        padding: 32px 24px;
+        gap: 12px;
+      }
+
+      .state-box {
+        padding: 14px 20px;
+        font-size: 0.8rem;
+      }
+
+      .flow-showcase {
+        margin: 56px 0;
+      }
+
+      .flow-item {
+        margin-bottom: 56px;
+      }
+
+      .flow-content h3 {
+        font-size: 1.2rem;
+      }
+
+      .quote {
+        padding: 48px 24px;
+        font-size: 1.15rem;
+      }
+
+      .lesson {
+        padding: 24px;
+      }
+
+      .lesson:hover {
+        padding-left: 32px;
+      }
+
+      .highlight {
+        padding: 24px;
+      }
+
+      .principles-box {
+        padding: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .state-diagram {
+        flex-direction: column;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+
+      .header-meta {
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="index.html" class="back-link">Back to home</a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-meta">
+          <span class="meta-badge">Personal Project</span>
+          <span class="meta-badge accent">2024</span>
+        </div>
+        <div class="section-label">Flow</div>
+        <h1>A Honest Attention System</h1>
+        <p class="intro">Track what you're actually doing — without guessing, cheating, or overthinking.</p>
+      </div>
+    </div>
+  </header>
+
+  <article>
+    <div class="container">
+
+      <!-- FLOW SECTIONS - Left to Right alignment -->
+      <div class="flow-section align-left">
+        <h2>What Flow Solves</h2>
+        <ul>
+          <li>Forget what you were doing</li>
+          <li>Feel busy but don't know where time went</li>
+          <li>Productivity tools feel heavy and judgmental</li>
+          <li>Decisions drain energy before work even starts</li>
+        </ul>
+        <div class="highlight">
+          <p>Flow removes guessing. It only tracks what you consciously choose.</p>
+        </div>
+      </div>
+
+      <div class="flow-section align-center">
+        <h2>How Flow Works</h2>
+        <div class="principles-box">
+          <p><strong>One activity at a time.</strong></p>
+          <p><strong>You must start and stop explicitly.</strong></p>
+          <p><strong>If something conflicts, Flow asks you to choose.</strong></p>
+        </div>
+        <p>That's it.</p>
+      </div>
+
+      <div class="flow-section align-right">
+        <h2>Activity Lifecycle</h2>
+        <div class="state-diagram">
+          <div class="state-box">Idle</div>
+          <span class="arrow">→</span>
+          <div class="state-box active">Active</div>
+          <span class="arrow">→</span>
+          <div class="state-box">Paused</div>
+          <span class="arrow">→</span>
+          <div class="state-box">Stopped</div>
+        </div>
+        <p>No background tracking. No auto-resume. No silent behavior.</p>
+      </div>
+
+      <!-- FLOW SHOWCASE -->
+      <div class="flow-showcase">
+
+        <!-- TAROT DECK: All Flow Features -->
+        <div class="deck-overlay" id="deckOverlay"></div>
+
+        <!-- Tarot Reading Popup -->
+        <div class="tarot-popup" id="tarotPopup">
+          <button class="popup-close" onclick="closePopup()">✕</button>
+          <img src="" alt="" class="popup-image" id="popupImage">
+          <div class="popup-content">
+            <h3 class="popup-title" id="popupTitle"></h3>
+            <p class="popup-tagline" id="popupTagline"></p>
+            <p class="popup-reading" id="popupReading"></p>
+          </div>
+        </div>
+
+        <div class="card-deck">
+
+          <!-- 1. Guided Flow -->
+          <div class="deck-card" data-title="Guided Flow" data-tagline="Helps you start when focus feels scattered."
+            data-reading="When you can't begin, Flow guides you through small steps until you're ready."
+            data-image="img/Guided Flow.jpg">
+            <img src="img/Guided Flow.jpg" alt="Guided Flow" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Guided</h3>
+            </div>
+          </div>
+
+          <!-- 2. Non-Negotiable Flow -->
+          <div class="deck-card" data-title="Non-Negotiable" data-tagline="Decide once. Stop renegotiating."
+            data-reading="Some things shouldn't need daily convincing. Set them once and let the system hold them."
+            data-image="img/Flow System — Non-Negotiable.png">
+            <img src="img/Flow System — Non-Negotiable.png" alt="Non-Negotiable" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Non-Negotiable</h3>
+            </div>
+          </div>
+
+          <!-- 3. If-Then Rules -->
+          <div class="deck-card" data-title="If–Then Rules" data-tagline="Decisions are made before energy runs out."
+            data-reading="Pre-decide your responses. When X happens, do Y — no thinking required."
+            data-image="img/If–Then Method.jpg">
+            <img src="img/If–Then Method.jpg" alt="If-Then Rules" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>If–Then</h3>
+            </div>
+          </div>
+
+          <!-- 4. Idea to Todo -->
+          <div class="deck-card" data-title="Idea → Todo" data-tagline="Capture ideas with time context, not guilt."
+            data-reading="Every idea records when it appeared. You'll know how long it's been sitting there."
+            data-image="img/Capture ideas.jpg">
+            <img src="img/Capture ideas.jpg" alt="Idea to Todo" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Idea → Todo</h3>
+            </div>
+          </div>
+
+          <!-- 5. Activity & Energy -->
+          <div class="deck-card" data-title="Activity & Energy" data-tagline="See what you did and how you felt."
+            data-reading="Track activities alongside energy levels. Patterns become visible over time."
+            data-image="img/Activity & Energy Tracking.jpg">
+            <img src="img/Activity & Energy Tracking.jpg" alt="Activity & Energy" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Energy</h3>
+            </div>
+          </div>
+
+          <!-- 6. Global Memo -->
+          <div class="deck-card" data-title="Global Memo" data-tagline="Save thoughts anytime. Find them later."
+            data-reading="Capture ideas without leaving what you're doing. Search them when you need them."
+            data-image="img/Global Memo Search.jpg">
+            <img src="img/Global Memo Search.jpg" alt="Global Memo" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Memo</h3>
+            </div>
+          </div>
+
+          <!-- 7. Idle Awareness -->
+          <div class="deck-card" data-title="Idle Awareness"
+            data-tagline="When you drift, Flow asks what just happened."
+            data-reading="Drifted for a while? Flow gently asks what you were doing — no judgment, just logging."
+            data-image="img/Idle Awareness Notification.jpg">
+            <img src="img/Idle Awareness Notification.jpg" alt="Idle Awareness" class="card-image" loading="lazy">
+            <div class="card-content">
+              <h3>Idle</h3>
+            </div>
+          </div>
+
+        </div>
+        <p class="deck-hint">✦ tap a card to reveal its meaning ✦</p>
+
+      </div>
+
+      <div class="quote">
+        You are only conscious of what you track.
+      </div>
+    </div>
+
+    <section class="back">
+      <a href="index.html">Back to Projects</a>
+    </section>
+  </article>
+
+  <footer>
+    <span class="footer-text">&copy; 2026 Karima</span>
+  </footer>
+
+  <script>
+    // Scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Header blur effect on scroll
+    const nav = document.querySelector('nav');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+
+      if (currentScroll > 50) {
+        nav.style.background = 'rgba(10, 10, 10, 0.95)';
+      } else {
+        nav.style.background = 'rgba(10, 10, 10, 0.8)';
+      }
+
+      lastScroll = currentScroll;
+    });
+
+    // Tarot deck popup functions
+    const overlay = document.getElementById('deckOverlay');
+    const popup = document.getElementById('tarotPopup');
+    const popupImage = document.getElementById('popupImage');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupTagline = document.getElementById('popupTagline');
+    const popupReading = document.getElementById('popupReading');
+
+    // Add click listeners to all deck cards
+    document.querySelectorAll('.deck-card').forEach(card => {
+      card.addEventListener('click', () => openTarotReading(card));
+    });
+
+    let selectedCard = null;
+
+    function openTarotReading(card) {
+      const title = card.dataset.title;
+      const tagline = card.dataset.tagline;
+      const reading = card.dataset.reading;
+      const image = card.dataset.image;
+
+      // Step 1: Card comes forward
+      selectedCard = card;
+      card.classList.add('selected');
+
+      // Step 2: After card animation, show popup
+      setTimeout(() => {
+        popupImage.src = image;
+        popupImage.alt = title;
+        popupTitle.textContent = title;
+        popupTagline.textContent = tagline;
+        popupReading.textContent = reading;
+
+        overlay.classList.add('visible');
+        popup.classList.add('visible');
+        document.body.style.overflow = 'hidden';
+      }, 300);
+    }
+
+    function closePopup() {
+      overlay.classList.remove('visible');
+      popup.classList.remove('visible');
+      document.body.style.overflow = '';
+
+      // Reset selected card
+      if (selectedCard) {
+        selectedCard.classList.remove('selected');
+        selectedCard = null;
+      }
+    }
+
+    // Close popup when clicking overlay
+    overlay.addEventListener('click', closePopup);
+
+    // Close popup with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePopup();
+      }
+    });
+  </script>
+
+</body>
+
+</html>
